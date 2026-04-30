@@ -73,6 +73,8 @@ body {
   width: 100%;
   max-width: 480px;
   aspect-ratio: 1;
+  height: auto;
+  min-height: 280px;
 }
 
 canvas {

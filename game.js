@@ -37,6 +37,7 @@
   let combo = 0;
   let selected = null;    // {col, row}
   let locked = false;      // block input during animation
+  let gameStarted = false; // welcome overlay state
 
   // Animation queues
   let anims = [];
@@ -46,13 +47,30 @@
     resize();
     window.addEventListener('resize', resize);
     canvas.addEventListener('pointerdown', onPointerDown);
-    restartBtn.addEventListener('click', restart);
+    restartBtn.addEventListener('click', onRestartClick);
+    showWelcome();
+  }
+
+  function showWelcome() {
+    overlayTitle.textContent = '消消乐';
+    overlayMsg.textContent = '点击相邻宝石交换位置，3个相同即可消除！';
+    restartBtn.textContent = '开始游戏';
+    overlay.classList.add('show');
+  }
+
+  function onRestartClick() {
+    if (!gameStarted) {
+      gameStarted = true;
+    }
     restart();
   }
 
   function resize() {
     const rect = canvas.parentElement.getBoundingClientRect();
-    const size = Math.floor(Math.min(rect.width, rect.height));
+    const w = rect.width || 320;
+    const h = rect.height || 320;
+    const size = Math.floor(Math.min(w, h));
+    if (size <= 0) return;
     canvas.width = size * (window.devicePixelRatio || 1);
     canvas.height = size * (window.devicePixelRatio || 1);
     canvas.style.width = size + 'px';
@@ -63,7 +81,7 @@
     padding = Math.floor(cellSize * 0.1);
     offsetX = (size - COLS * cellSize) / 2;
     offsetY = (size - ROWS * cellSize) / 2;
-    draw();
+    if (board.length) draw();
   }
 
   function restart() {
@@ -347,6 +365,21 @@
     overlayTitle.textContent = '游戏结束';
     overlayMsg.textContent = `最终得分: ${score}`;
     overlay.classList.add('show');
+  }
+
+  // ─── Polyfill: roundRect for older browsers ─────────
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+      if (typeof r === 'number') r = [r];
+      const radii = r.map(v => Math.min(v, w / 2, h / 2));
+      const rad = radii[0] || 0;
+      this.moveTo(x + rad, y);
+      this.arcTo(x + w, y, x + w, y + h, rad);
+      this.arcTo(x + w, y + h, x, y + h, rad);
+      this.arcTo(x, y + h, x, y, rad);
+      this.arcTo(x, y, x + w, y, rad);
+      this.closePath();
+    };
   }
 
   // ─── Boot ──────────────────────────────────────────
