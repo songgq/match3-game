@@ -10,12 +10,12 @@
 
   // Gem visuals
   const GEMS = [
-    { color: '#f5576c', shadow: '#c62828', shape: 'circle' },  // red
-    { color: '#4facfe', shadow: '#0277bd', shape: 'circle' },  // blue
-    { color: '#43e97b', shadow: '#2e7d32', shape: 'circle' },  // green
-    { color: '#fa709a', shadow: '#ad1457', shape: 'circle' },  // pink
-    { color: '#fee440', shadow: '#f9a825', shape: 'circle' },  // yellow
-    { color: '#a18cd1', shadow: '#4527a0', shape: 'circle' },  // purple
+    { color: '#f5576c', shadow: '#c62828' },
+    { color: '#4facfe', shadow: '#0277bd' },
+    { color: '#43e97b', shadow: '#2e7d32' },
+    { color: '#fa709a', shadow: '#ad1457' },
+    { color: '#fee440', shadow: '#f9a825' },
+    { color: '#a18cd1', shadow: '#4527a0' },
   ];
 
   // ─── DOM refs ──────────────────────────────────────
@@ -28,19 +28,194 @@
   const overlayTitle = document.getElementById('overlay-title');
   const overlayMsg = document.getElementById('overlay-msg');
   const restartBtn = document.getElementById('restart-btn');
+  const muteBtn = document.getElementById('mute-btn');
 
   // ─── State ─────────────────────────────────────────
   let cellSize, padding, offsetX, offsetY;
-  let board = [];         // board[col][row]
+  let board = [];
   let score = 0;
   let steps = TOTAL_STEPS;
   let combo = 0;
-  let selected = null;    // {col, row}
-  let locked = false;      // block input during animation
-  let gameStarted = false; // welcome overlay state
+  let selected = null;
+  let locked = false;
+  let gameStarted = false;
+  let muted = false;
 
-  // Animation queues
-  let anims = [];
+  // Visual effects
+  let particles = [];
+  let floatingTexts = [];
+
+  // ─── Audio Engine ──────────────────────────────────
+  let audioCtx = null;
+
+  function ensureAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTone(freq, duration, type, volume) {
+    if (muted || !audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(volume || 0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  }
+
+  function sfxSelect() {
+    playTone(600, 0.08, 'sine', 0.1);
+  }
+
+  function sfxSwap() {
+    playTone(400, 0.1, 'triangle', 0.12);
+  }
+
+  function sfxSwapBack() {
+    playTone(250, 0.12, 'triangle', 0.1);
+  }
+
+  function sfxPop(count) {
+    // ascending notes for each gem removed
+    for (let i = 0; i < Math.min(count, 6); i++) {
+      setTimeout(() => {
+        playTone(500 + i * 120, 0.15, 'sine', 0.12);
+      }, i * 40);
+    }
+  }
+
+  function sfxCombo(level) {
+    // bright fanfare for combos
+    const notes = [523, 659, 784, 988, 1175];
+    for (let i = 0; i < Math.min(level, notes.length); i++) {
+      setTimeout(() => {
+        playTone(notes[i], 0.2, 'square', 0.08);
+      }, i * 60);
+    }
+  }
+
+  function sfxGameOver() {
+    const notes = [392, 349, 330, 262];
+    notes.forEach((n, i) => {
+      setTimeout(() => playTone(n, 0.3, 'sine', 0.12), i * 200);
+    });
+  }
+
+  function sfxStart() {
+    const notes = [262, 330, 392, 523];
+    notes.forEach((n, i) => {
+      setTimeout(() => playTone(n, 0.2, 'sine', 0.1), i * 100);
+    });
+  }
+
+  // ─── Particle System ───────────────────────────────
+  function spawnParticles(col, row, color, count) {
+    const cx = offsetX + col * cellSize + cellSize / 2;
+    const cy = offsetY + row * cellSize + cellSize / 2;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.5 + Math.random() * 3;
+      particles.push({
+        x: cx,
+        y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.015 + Math.random() * 0.02,
+        size: 2 + Math.random() * 4,
+        color: color,
+      });
+    }
+  }
+
+  function spawnComboBurst(count) {
+    // big burst from board center for combos
+    const boardSize = COLS * cellSize;
+    const cx = offsetX + boardSize / 2;
+    const cy = offsetY + boardSize / 2;
+    const colors = ['#fff', '#ffd700', '#ff6b6b', '#48dbfb', '#ff9ff3'];
+    for (let i = 0; i < count * 8; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 5;
+      particles.push({
+        x: cx,
+        y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.01 + Math.random() * 0.015,
+        size: 3 + Math.random() * 6,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      });
+    }
+  }
+
+  function spawnFloatingText(col, row, text, color) {
+    const cx = offsetX + col * cellSize + cellSize / 2;
+    const cy = offsetY + row * cellSize + cellSize / 2;
+    floatingTexts.push({
+      x: cx,
+      y: cy,
+      text: text,
+      color: color || '#fff',
+      life: 1,
+      decay: 0.018,
+      vy: -1.5,
+      size: 16 + Math.min(text.length, 5),
+    });
+  }
+
+  function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.08; // gravity
+      p.life -= p.decay;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+    for (let i = floatingTexts.length - 1; i >= 0; i--) {
+      const ft = floatingTexts[i];
+      ft.y += ft.vy;
+      ft.life -= ft.decay;
+      if (ft.life <= 0) floatingTexts.splice(i, 1);
+    }
+  }
+
+  function drawParticles() {
+    for (const p of particles) {
+      ctx.save();
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 4;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawFloatingTexts() {
+    for (const ft of floatingTexts) {
+      ctx.save();
+      ctx.globalAlpha = ft.life;
+      ctx.fillStyle = ft.color;
+      ctx.shadowColor = 'rgba(0,0,0,0.4)';
+      ctx.shadowBlur = 4;
+      ctx.font = `bold ${ft.size}px 'Segoe UI', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(ft.text, ft.x, ft.y);
+      ctx.restore();
+    }
+  }
 
   // ─── Init ──────────────────────────────────────────
   function init() {
@@ -48,7 +223,13 @@
     window.addEventListener('resize', resize);
     canvas.addEventListener('pointerdown', onPointerDown);
     restartBtn.addEventListener('click', onRestartClick);
+    muteBtn.addEventListener('click', onMuteClick);
     showWelcome();
+  }
+
+  function onMuteClick() {
+    muted = !muted;
+    muteBtn.textContent = muted ? '🔇' : '🔊';
   }
 
   function showWelcome() {
@@ -59,8 +240,10 @@
   }
 
   function onRestartClick() {
+    ensureAudio();
     if (!gameStarted) {
       gameStarted = true;
+      sfxStart();
     }
     restart();
   }
@@ -91,7 +274,8 @@
     combo = 0;
     selected = null;
     locked = false;
-    anims = [];
+    particles = [];
+    floatingTexts = [];
     updateUI();
     generateBoard();
     draw();
@@ -124,7 +308,7 @@
     const size = canvas.width / (window.devicePixelRatio || 1);
     ctx.clearRect(0, 0, size, size);
 
-    // Draw grid background
+    // Grid background
     ctx.fillStyle = 'rgba(255,255,255,0.04)';
     for (let c = 0; c < COLS; c++) {
       for (let r = 0; r < ROWS; r++) {
@@ -139,7 +323,7 @@
       }
     }
 
-    // Draw gems
+    // Gems
     for (let c = 0; c < COLS; c++) {
       for (let r = 0; r < ROWS; r++) {
         if (board[c][r] >= 0) {
@@ -148,7 +332,7 @@
       }
     }
 
-    // Draw selection highlight
+    // Selection highlight
     if (selected) {
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 3;
@@ -165,12 +349,16 @@
       ctx.stroke();
       ctx.shadowBlur = 0;
     }
+
+    // Effects
+    drawParticles();
+    drawFloatingTexts();
   }
 
-  function drawGem(col, row, type, animOffsetX, animOffsetY) {
+  function drawGem(col, row, type) {
     const gem = GEMS[type];
-    const cx = offsetX + col * cellSize + cellSize / 2 + (animOffsetX || 0);
-    const cy = offsetY + row * cellSize + cellSize / 2 + (animOffsetY || 0);
+    const cx = offsetX + col * cellSize + cellSize / 2;
+    const cy = offsetY + row * cellSize + cellSize / 2;
     const radius = cellSize / 2 - padding;
 
     ctx.save();
@@ -198,6 +386,7 @@
   // ─── Interaction ───────────────────────────────────
   function onPointerDown(e) {
     if (locked) return;
+    ensureAudio();
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left - offsetX;
     const y = e.clientY - rect.top - offsetY;
@@ -207,6 +396,7 @@
 
     if (!selected) {
       selected = { col, row };
+      sfxSelect();
       draw();
     } else {
       const dc = Math.abs(selected.col - col);
@@ -215,6 +405,7 @@
         trySwap(selected.col, selected.row, col, row);
       } else {
         selected = { col, row };
+        sfxSelect();
         draw();
       }
     }
@@ -224,14 +415,14 @@
     locked = true;
     selected = null;
 
-    // Swap
     swap(c1, r1, c2, r2);
+    sfxSwap();
     await animate(ANIM_DURATION);
 
     const matches = findMatches();
     if (matches.length === 0) {
-      // Swap back
       swap(c1, r1, c2, r2);
+      sfxSwapBack();
       await animate(ANIM_DURATION);
       locked = false;
       draw();
@@ -245,6 +436,7 @@
     await processMatches();
 
     if (steps <= 0) {
+      sfxGameOver();
       showEnd();
     }
     locked = false;
@@ -303,23 +495,45 @@
       score += pts;
       updateUI();
 
-      // Pop animation
+      // Sound effects
+      sfxPop(matches.length);
+      if (combo >= 2) {
+        setTimeout(() => sfxCombo(combo), 100);
+      }
+
+      // Particles + floating score for each matched gem
       for (const m of matches) {
+        spawnParticles(m.col, m.row, GEMS[m.type].color, 12);
         board[m.col][m.row] = -1;
       }
-      draw();
-      await animate(250);
+
+      // Floating score text at center of matches
+      const midCol = matches.reduce((s, m) => s + m.col, 0) / matches.length;
+      const midRow = matches.reduce((s, m) => s + m.row, 0) / matches.length;
+      const comboLabel = combo > 1 ? `x${combo}` : '';
+      spawnFloatingText(
+        Math.round(midCol),
+        Math.round(midRow),
+        `+${pts} ${comboLabel}`,
+        combo >= 3 ? '#ffd700' : combo >= 2 ? '#48dbfb' : '#fff'
+      );
+
+      if (combo >= 3) {
+        spawnComboBurst(combo);
+      }
+
+      // Animation loop while particles are alive
+      await animateWithParticles(400);
 
       // Gravity
       applyGravity();
-      draw();
-      await animate(ANIM_DURATION);
+      await animateWithParticles(ANIM_DURATION);
 
       // Fill
       fillEmpty();
-      draw();
-      await animate(ANIM_DURATION);
+      await animateWithParticles(ANIM_DURATION);
 
+      draw();
       matches = findMatches();
     }
   }
@@ -349,9 +563,25 @@
     }
   }
 
-  // ─── Animation helper ──────────────────────────────
+  // ─── Animation helpers ─────────────────────────────
   function animate(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function animateWithParticles(ms) {
+    return new Promise(resolve => {
+      const start = performance.now();
+      function tick(now) {
+        updateParticles();
+        draw();
+        if (now - start < ms) {
+          requestAnimationFrame(tick);
+        } else {
+          resolve();
+        }
+      }
+      requestAnimationFrame(tick);
+    });
   }
 
   // ─── UI ────────────────────────────────────────────
@@ -364,15 +594,15 @@
   function showEnd() {
     overlayTitle.textContent = '游戏结束';
     overlayMsg.textContent = `最终得分: ${score}`;
+    restartBtn.textContent = '重新开始';
     overlay.classList.add('show');
   }
 
-  // ─── Polyfill: roundRect for older browsers ─────────
+  // ─── Polyfill: roundRect ───────────────────────────
   if (!CanvasRenderingContext2D.prototype.roundRect) {
     CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
       if (typeof r === 'number') r = [r];
-      const radii = r.map(v => Math.min(v, w / 2, h / 2));
-      const rad = radii[0] || 0;
+      const rad = (r[0] || 0);
       this.moveTo(x + rad, y);
       this.arcTo(x + w, y, x + w, y + h, rad);
       this.arcTo(x + w, y + h, x, y + h, rad);

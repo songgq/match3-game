@@ -40,6 +40,7 @@ body {
 .info-bar {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 16px;
 }
 
@@ -104,6 +105,26 @@ canvas {
 .overlay.show {
   opacity: 1;
   pointer-events: auto;
+}
+
+.mute-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 20px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: transform 0.15s ease;
+  line-height: 1;
+}
+
+.mute-btn:hover {
+  transform: scale(1.1);
+}
+
+.mute-btn:active {
+  transform: scale(0.9);
 }
 
 .overlay-content {
