@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>消消乐</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="game-container">
+  <div class="header">
+    <h1 class="title">消消乐</h1>
+    <div class="info-bar">
+      <div class="score-box">
+        <span class="label">得分</span>
+        <span class="value" id="score">0</span>
+      </div>
+      <div class="steps-box">
+        <span class="label">步数</span>
+        <span class="value" id="steps">30</span>
+      </div>
+      <div class="combo-box">
+        <span class="label">连击</span>
+        <span class="value" id="combo">0</span>
+      </div>
+    </div>
+  </div>
+  <div class="board-wrapper">
+    <canvas id="board"></canvas>
+    <div class="overlay" id="overlay">
+      <div class="overlay-content">
+        <h2 id="overlay-title">游戏结束</h2>
+        <p id="overlay-msg">最终得分: 0</p>
+        <button id="restart-btn">重新开始</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <p>点击相邻方块交换，3个相同方块连成一线即可消除</p>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
