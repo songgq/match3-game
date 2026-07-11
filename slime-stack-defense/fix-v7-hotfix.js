@@ -35,6 +35,23 @@
       this.updateCardState();
     };
 
+    const startBtn = byId('startBtn');
+    if (startBtn && !byId('startLevelSettingsV7')) {
+      const startSettings = document.createElement('button');
+      startSettings.id = 'startLevelSettingsV7';
+      startSettings.type = 'button';
+      startSettings.textContent = '⚙ 关卡设置';
+      Object.assign(startSettings.style, {
+        width: '100%', height: '38px', marginBottom: '9px', border: '1px solid rgba(113,81,220,.18)',
+        borderRadius: '13px', background: '#f1ebff', color: '#674bd0', fontSize: '11px',
+        fontWeight: '900', cursor: 'pointer'
+      });
+      startBtn.parentElement.insertBefore(startSettings, startBtn);
+      startSettings.addEventListener('click', () => byId('settingsBtnV7')?.click());
+    }
+    const bossTip = document.querySelector('.how-grid>div:nth-child(3) small');
+    if (bossTip) bossTip.textContent = '击败多波敌人与最终 Boss';
+
     document.addEventListener('pointerdown', event => {
       const rect = game.canvas.getBoundingClientRect();
       if (event.clientX < rect.left || event.clientX > rect.right ||
