@@ -2,7 +2,7 @@
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#f8f2ff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<title>史莱姆叠塔守卫</title><link rel="stylesheet" href="style.css">
+<title>史莱姆叠塔守卫</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="fix-v7.css?v=7">
 </head><body>
 <main id="app" aria-label="史莱姆叠塔守卫游戏">
 <canvas id="gameCanvas"></canvas>
@@ -17,4 +17,4 @@
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
 <script>
 (async()=>{try{const n=8,r=await Promise.all(Array.from({length:n},(_,i)=>fetch(`b64-${String(i+1).padStart(2,'0')}.txt`).then(x=>{if(!x.ok)throw new Error(`加载失败 ${x.status}`);return x.text()})));{const b=atob(r.join('')),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);(0,eval)(new TextDecoder('utf-8').decode(u))}}catch(e){document.body.innerHTML='<div style="padding:24px;font-family:sans-serif">游戏加载失败，请刷新页面。<br>'+e.message+'</div>'}})();
-</script><script src="fix-v4.js?v=4"></script><script src="fix-v5.js?v=5"></script><script src="fix-v6.js?v=6"></script></body></html>
+</script><script src="fix-v4.js?v=4"></script><script src="fix-v5.js?v=5"></script><script src="fix-v6.js?v=6"></script><script src="fix-v7.js?v=7"></script></body></html>
