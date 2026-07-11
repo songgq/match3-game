@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f8f2ff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>史莱姆叠塔守卫</title><link rel="stylesheet" href="style.css">
+</head><body>
+<main id="app" aria-label="史莱姆叠塔守卫游戏">
+<canvas id="gameCanvas"></canvas>
+<section id="hud" class="glass-panel"><div class="hud-left"><div class="brand-mark"><span>史</span></div><div><div class="game-title">史莱姆叠塔守卫</div><div class="wave-line"><span id="waveText">第 1 波</span><span class="dot">·</span><span id="enemyText">准备中</span></div></div></div><button id="soundBtn" class="icon-btn" aria-label="切换声音">🔊</button></section>
+<section id="stats" class="glass-panel"><div class="stat-row"><span class="stat-label">核心</span><div class="bar-track hp-track"><div id="hpBar" class="bar-fill hp-fill"></div></div><strong id="hpText">100</strong></div><div class="stat-row"><span class="stat-label">能量</span><div class="bar-track energy-track"><div id="energyBar" class="bar-fill energy-fill"></div></div><strong id="energyText">100</strong></div><div class="score-row"><span>击败 <b id="killText">0</b></span><span>连击 <b id="comboText">0</b></span></div></section>
+<div id="toast" role="status" aria-live="polite"></div>
+<button id="rotateBtn" class="action-btn rotate-btn" aria-label="旋转方块"><span class="action-icon">↻</span><span>旋转</span></button>
+<section id="pieceDock" class="piece-dock glass-panel" aria-label="待选方块"><div class="dock-title"><span>拖出一块，松手投放</span><span id="costHint">消耗 28 能量</span></div><div id="pieceChoices" class="piece-choices"></div></section>
+<section id="startOverlay" class="overlay visible"><div class="modal hero-modal"><div class="hero-badge">竖屏塔防 · 物理堆叠</div><h1>史莱姆叠塔守卫</h1><p>把俄罗斯方块叠成一座会开火的塔。堆稳，才能守住核心。</p><div class="mini-demo" aria-hidden="true"><div class="demo-path"></div><div class="demo-block b1"></div><div class="demo-block b2"></div><div class="demo-block b3"></div><div class="demo-slime s1">•ᴗ•</div><div class="demo-slime s2">•ᴗ•</div><div class="demo-monster">☠</div></div><div class="how-grid"><div><span>1</span><b>拖动投放</b><small>从底部卡牌直接拖入场内</small></div><div><span>2</span><b>稳住塔身</b><small>倾斜超过 45° 会停火</small></div><div><span>3</span><b>守住核心</b><small>击败 5 波与最终 Boss</small></div></div><button id="startBtn" class="primary-btn">开始守卫</button><small class="tip-line">建议开启声音，首次点击后音乐才会播放</small></div></section>
+<section id="resultOverlay" class="overlay"><div class="modal result-modal"><div id="resultEmoji" class="result-emoji">🏆</div><h2 id="resultTitle">守卫成功</h2><p id="resultDesc">核心安全，史莱姆们欢呼起来！</p><div class="result-stats"><div><span>击败</span><b id="resultKills">0</b></div><div><span>最高连击</span><b id="resultCombo">0</b></div><div><span>剩余核心</span><b id="resultHp">0</b></div></div><button id="restartBtn" class="primary-btn">再守一局</button></div></section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+<script>
+(async()=>{try{const n=5,r=await Promise.all(Array.from({length:n},(_,i)=>fetch(`game.part${i+1}.txt`).then(x=>{if(!x.ok)throw new Error(`加载失败 ${x.status}`);return x.text()})));(0,eval)(r.join(''))}catch(e){document.body.innerHTML='<div style="padding:24px;font-family:sans-serif">游戏加载失败，请刷新页面。<br>'+e.message+'</div>'}})();
+</script></body></html>
