@@ -1,0 +1,52 @@
+/* V7 campaign, compact HUD and airborne controls */
+#hud{height:58px;padding:7px 8px 7px 10px;border-radius:18px}
+#hud .brand-mark{width:38px;height:38px;border-radius:12px;font-size:17px}
+#hud .game-title{font-size:14px}
+#hud .wave-line{font-size:10px;margin-top:2px}
+.hud-actions-v7{display:flex;align-items:center;gap:6px;margin-left:auto}
+.level-btn-v7{height:40px;min-width:78px;border:1px solid rgba(255,255,255,.95);border-radius:13px;background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(239,232,255,.92));box-shadow:0 6px 15px rgba(92,67,148,.13);color:#433653;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:4px 9px;line-height:1.05;cursor:pointer}
+.level-btn-v7 b{font-size:11px;white-space:nowrap}
+.level-btn-v7 small{font-size:8px;color:#7c6f8c;margin-top:3px;white-space:nowrap}
+.settings-btn-v7,#soundBtn{width:40px;height:40px;border-radius:13px;font-size:17px}
+#stats.stats-inline-v7{top:calc(max(10px,env(safe-area-inset-top)) + 64px);left:12px;right:12px;width:auto;min-height:46px;padding:6px;border-radius:16px;display:grid;grid-template-columns:1fr 1fr .92fr;gap:6px;pointer-events:none}
+#stats.stats-inline-v7 .stat-row,#stats.stats-inline-v7 .score-row{margin:0;min-width:0;height:34px;border:1px solid rgba(255,255,255,.82);background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(246,241,255,.72));border-radius:11px;padding:5px 6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.85)}
+#stats.stats-inline-v7 .stat-row{display:grid;grid-template-columns:auto 1fr auto;gap:4px;align-items:center}
+#stats.stats-inline-v7 .stat-label{font-size:8px;letter-spacing:.03em}
+#stats.stats-inline-v7 .stat-row strong{font-size:9px;min-width:20px}
+#stats.stats-inline-v7 .bar-track{height:7px}
+#stats.stats-inline-v7 .score-row{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:8px;line-height:1.2}
+#stats.stats-inline-v7 .score-row span{display:flex;gap:3px;white-space:nowrap}
+#stats.stats-inline-v7 .score-row b{font-size:10px}
+#toast{top:128px}
+.piece-dock{left:8px;right:8px;height:106px;padding:7px 8px 8px;border-radius:20px}
+.dock-title{height:18px;padding:0 3px 5px;font-size:9px}
+.piece-choices{height:73px;gap:6px}
+.piece-card{border-radius:14px;box-shadow:0 4px 12px rgba(79,61,120,.09)}
+.card-canvas{width:66px;height:58px;transform:none!important}
+.card-label{left:4px;right:4px;bottom:4px;min-height:22px;padding:4px 5px;border-radius:9px;background:linear-gradient(90deg,rgba(255,255,255,.92),rgba(239,233,255,.87));box-shadow:0 2px 8px rgba(65,47,101,.11);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);font-size:8px;color:#7a6c89}
+.card-label b{font-size:9px;color:#372d48}
+.rotation-badge{display:none!important}
+.rotate-btn{right:12px;bottom:calc(120px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:15px}
+.rotate-btn .action-icon{font-size:23px}
+.air-guide-v7{position:absolute;z-index:3;top:36%;width:58px;height:86px;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:scale(.94);transition:opacity .2s ease,transform .2s ease;pointer-events:none;color:#74638a;text-shadow:0 1px 0 #fff}
+.air-guide-v7.left{left:2px}.air-guide-v7.right{right:2px}
+.air-guide-v7 span{width:36px;height:36px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,.64);border:1px dashed rgba(113,81,220,.38);box-shadow:0 7px 18px rgba(74,53,105,.10);font-size:29px;line-height:1;color:#7d61de}
+.air-guide-v7 small{margin-top:5px;font-size:8px;font-weight:900;background:rgba(255,255,255,.68);padding:3px 6px;border-radius:99px;white-space:nowrap}
+.air-guide-v7.active{opacity:.74;transform:scale(1)}
+.level-overlay-v7{z-index:30}
+.level-modal-v7{width:min(100%,410px);padding:18px;border-radius:24px;text-align:left;max-height:88vh;overflow:hidden;display:flex;flex-direction:column}
+.level-modal-head-v7{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.level-modal-head-v7 small{display:block;color:#887a98;font-weight:800;font-size:9px;letter-spacing:.08em}
+.level-modal-head-v7 h2{margin:3px 0 0;font-size:23px}
+.level-modal-head-v7 button{width:36px;height:36px;border:0;border-radius:12px;background:#f0e9ff;color:#6348be;font-size:25px;line-height:1;cursor:pointer}
+.level-progress-v7{margin:4px 0 10px;color:#746881;font-size:11px;font-weight:800}
+.level-grid-v7{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;overflow:auto;padding:2px 2px 6px;scrollbar-width:thin}
+.level-cell-v7{position:relative;aspect-ratio:1;border:1px solid rgba(255,255,255,.95);border-radius:12px;background:linear-gradient(145deg,#fff,#eee8ff);box-shadow:0 4px 10px rgba(76,56,112,.08);color:#41364e;font-size:12px;font-weight:900;cursor:pointer}
+.level-cell-v7.cleared{background:linear-gradient(145deg,#e8ffe6,#d9f6d9);color:#438040}
+.level-cell-v7.current{background:linear-gradient(145deg,#a184ff,#6f51df);color:#fff;box-shadow:0 7px 16px rgba(112,81,223,.28);transform:translateY(-1px)}
+.level-cell-v7:disabled{background:#f1edf5;color:#aaa1b2;box-shadow:none;cursor:not-allowed}
+.level-cell-v7:disabled span{display:block;font-size:10px;line-height:1}
+.level-cell-v7:disabled small{display:block;font-size:8px;margin-top:2px}
+.level-note-v7{margin-top:10px;padding:9px 10px;border-radius:12px;background:#f5f1ff;color:#80738e;font-size:9px;line-height:1.45;text-align:center}
+@media (max-width:365px){#hud .brand-mark{display:none}#hud .hud-left{gap:4px}.level-btn-v7{min-width:68px;padding-left:7px;padding-right:7px}.settings-btn-v7,#soundBtn{width:36px;height:36px}#stats.stats-inline-v7{grid-template-columns:1fr 1fr .85fr;gap:4px}#stats.stats-inline-v7 .stat-row,#stats.stats-inline-v7 .score-row{padding-left:4px;padding-right:4px}}
+@media (max-height:680px){#hud{height:52px}#stats.stats-inline-v7{top:68px;min-height:42px;padding:4px}#stats.stats-inline-v7 .stat-row,#stats.stats-inline-v7 .score-row{height:32px}.piece-dock{height:94px}.piece-choices{height:63px}.card-canvas{width:58px;height:52px}.rotate-btn{bottom:106px}.level-modal-v7{max-height:94vh}}
