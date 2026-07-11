@@ -16,5 +16,5 @@
 </main>
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
 <script>
-(async()=>{try{const n=5,r=await Promise.all(Array.from({length:n},(_,i)=>fetch(`game.part${i+1}.txt`).then(x=>{if(!x.ok)throw new Error(`加载失败 ${x.status}`);return x.text()})));(0,eval)(r.join(''))}catch(e){document.body.innerHTML='<div style="padding:24px;font-family:sans-serif">游戏加载失败，请刷新页面。<br>'+e.message+'</div>'}})();
+(async()=>{try{const n=8,r=await Promise.all(Array.from({length:n},(_,i)=>fetch(`b64-${String(i+1).padStart(2,'0')}.txt`).then(x=>{if(!x.ok)throw new Error(`加载失败 ${x.status}`);return x.text()})));(0,eval)(atob(r.join('')))}catch(e){document.body.innerHTML='<div style="padding:24px;font-family:sans-serif">游戏加载失败，请刷新页面。<br>'+e.message+'</div>'}})();
 </script></body></html>
