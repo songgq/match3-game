@@ -17,4 +17,4 @@
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
 <script>
 (async()=>{try{const n=8,r=await Promise.all(Array.from({length:n},(_,i)=>fetch(`b64-${String(i+1).padStart(2,'0')}.txt`).then(x=>{if(!x.ok)throw new Error(`加载失败 ${x.status}`);return x.text()})));{const b=atob(r.join('')),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);(0,eval)(new TextDecoder('utf-8').decode(u))}}catch(e){document.body.innerHTML='<div style="padding:24px;font-family:sans-serif">游戏加载失败，请刷新页面。<br>'+e.message+'</div>'}})();
-</script><script src="fix-v4.js?v=4"></script></body></html>
+</script><script src="fix-v4.js?v=4"></script><script src="fix-v5.js?v=5"></script></body></html>
